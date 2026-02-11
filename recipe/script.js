@@ -1,5 +1,20 @@
-fetch("/recipeslist/test.json")
-    .then(res => res.json())
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const params = Object.fromEntries(urlParams.entries());
+
+fetch("/recipeslist/" + params.name + ".json")
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            document.getElementById("recipe").remove();
+
+            const failMessage = document.createElement("h1");
+            failMessage.textContent = "Failed to read JSON file.";
+
+            document.body.appendChild(failMessage);
+        }
+    })
     .then(data => {
         document.getElementById("title").textContent = data.name;
 
