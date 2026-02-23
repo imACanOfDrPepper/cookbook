@@ -2,7 +2,7 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const params = Object.fromEntries(urlParams.entries());
 
-fetch("/recipeslist/" + params.name + ".json")
+fetch(`/api/v1/get_recipe?name=${params.name}`)
     .then(response => {
         if (response.ok) {
             return response.json();
