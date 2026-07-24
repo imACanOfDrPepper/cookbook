@@ -2,7 +2,7 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const params = Object.fromEntries(urlParams.entries());
 
-fetch(`/api/v1/get_recipe?name=${params.name}`)
+fetch(`/api/get-recipe?name=${params.name}`)
     .then(response => {
         if (response.ok) {
             return response.json();
@@ -19,7 +19,7 @@ fetch(`/api/v1/get_recipe?name=${params.name}`)
         document.getElementById("title").textContent = data.name;
 
         const thumbnail = document.getElementById("thumbnail");
-        thumbnail.src = `/api/v1/get_thumb?name=${params.name}`;
+        thumbnail.src = `/api/get-thumb?name=${params.name}`;
 
         thumbnail.onerror = () => {
             console.log(thumbnail.src);

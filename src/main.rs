@@ -21,8 +21,8 @@ static THUMBS_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("recipesl
 #[tokio::main]
 async fn main() {
     let app = Router::new()
-        .route("/api/v1/get_recipe", get(get_recipe))
-        .route("/api/v1/get_thumb", get(get_thumb))
+        .route("/api/get-recipe", get(get_recipe))
+        .route("/api/get-thumb", get(get_thumb))
         .fallback_service(ServeDir::new("frontend"));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
