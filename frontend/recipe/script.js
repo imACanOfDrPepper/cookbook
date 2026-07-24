@@ -19,9 +19,10 @@ fetch(`/api/v1/get_recipe?name=${params.name}`)
         document.getElementById("title").textContent = data.name;
 
         const thumbnail = document.getElementById("thumbnail");
-        thumbnail.src = `assets/${params.name}.png`;
+        thumbnail.src = `/api/v1/get_thumb?name=${params.name}`;
 
         thumbnail.onerror = () => {
+            console.log(thumbnail.src);
             thumbnail.src = "assets/placeholder.png"
         }
 
