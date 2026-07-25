@@ -1,22 +1,22 @@
+mod error;
+
+use crate::error::ApiError;
+
 use axum::{
     Router,
-    body::Body,
     extract::Query,
-    http::{StatusCode},
-    response::Response,
+    http::StatusCode,
+    response::{IntoResponse, Response},
     routing::get,
 };
+use tokio::fs;
 use tower_http::services::ServeDir;
-use std::{
-    collections::HashMap,
-    fs,
-    path::{PathBuf},
-    sync::LazyLock,
-};
+
+use std::{collections::HashMap, path::Path};
 
 const NAME_KEY: &str = "name";
-static RECIPES_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("recipeslist/"));
-static THUMBS_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("recipeslist/thumbs/"));
+static RECIPES_PATH: &str = "recipeslist/";
+static THUMBS_PATH: &str = "recipeslist/thumbs/";
 
 #[tokio::main]
 async fn main() {
@@ -29,66 +29,42 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn get_recipe(Query(params): Query<HashMap<String, String>>) -> Response {
-    let result = match params.get(NAME_KEY) {
-        Some(v) => {
-            let mut path = RECIPES_PATH.join(v);
-            path.add_extension("json");
-            fs::read_to_string(path)
-        }
-        None => {
-            return Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body(Body::from("Recipe name missing in query".to_string()))
-                .unwrap();
-        }
-    };
+async fn get_recipe(Query(params): Query<HashMap<String, String>>) -> Result<Response, ApiError> {
+    let name = params
+        .get(NAME_KEY)
+        .ok_or(ApiError::BadRequest("Recipe name missing in query"))?;
 
-    match result {
-        Ok(v) => {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .header("Content-Type", "application/json")
-                .body(v.into())
-                .unwrap();
-        }
-        Err(_) => {
-            return Response::builder()
-                .status(StatusCode::NOT_FOUND)
-                .body("Recipe not found".into())
-                .unwrap();
-        }
-    };
+        let mut path = Path::new(RECIPES_PATH).join(name);
+        path.add_extension("json");
+
+        let json = fs::read_to_string(path)
+            .await
+            .map_err(|_| ApiError::NotFound("Recipe not found"))?;
+        
+        Ok((
+            StatusCode::OK,
+            [("Content-Type", "application/json")],
+            json,
+        )
+            .into_response())
 }
 
-async fn get_thumb(Query(params): Query<HashMap<String, String>>) -> Response {
-    let result = match params.get(NAME_KEY) {
-        Some(v) => {
-            let mut path = THUMBS_PATH.join(v);
-            path.add_extension("png");
-            fs::read(path)
-        }
-        None => {
-            return Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body(Body::from("Recipe name missing in query".to_string()))
-                .unwrap();
-        }
-    };
+async fn get_thumb(Query(params): Query<HashMap<String, String>>) -> Result<Response, ApiError> {
+    let name = params
+        .get(NAME_KEY)
+        .ok_or(ApiError::BadRequest("Recipe name missing in query"))?;
 
-    match result {
-        Ok(v) => {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .header("Content-Type", "image/png")
-                .body(v.into())
-                .unwrap();
-        }
-        Err(_) => {
-            return Response::builder()
-                .status(StatusCode::NOT_FOUND)
-                .body("Thumbnail not found".into())
-                .unwrap();
-        }
-    };
+        let mut path = Path::new(THUMBS_PATH).join(name);
+        path.add_extension("png");
+
+        let image = fs::read(path)
+            .await
+            .map_err(|_| ApiError::NotFound("Thumbnail not found"))?;
+        
+        Ok((
+            StatusCode::OK,
+            [("Content-Type", "image/png")],
+            image,
+        )
+            .into_response())
 }
