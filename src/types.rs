@@ -1,4 +1,5 @@
 use axum::{http::StatusCode, response::IntoResponse};
+use serde::Serialize;
 
 pub enum ApiError {
     BadRequest(&'static str),
@@ -28,4 +29,10 @@ impl IntoResponse for ApiError {
                 .into_response()
         }
     }
+}
+
+#[derive(Serialize, Debug)]
+pub struct Recipe {
+    pub id: String,
+    pub name: String,
 }
