@@ -36,6 +36,10 @@ async fn get_recipe(Query(params): Query<HashMap<String, String>>) -> Result<Res
         .get(NAME_KEY)
         .ok_or(ApiError::BadRequest("Recipe name missing in query"))?;
 
+    if !name.chars().all(|c| c.is_alphabetic()) {
+        return Err(ApiError::NotFound("Recipe not found"));
+    }
+
     let mut path = Path::new(RECIPES_PATH).join(name);
     path.add_extension("json");
 
@@ -50,6 +54,10 @@ async fn get_thumb(Query(params): Query<HashMap<String, String>>) -> Result<Resp
     let name = params
         .get(NAME_KEY)
         .ok_or(ApiError::BadRequest("Recipe name missing in query"))?;
+
+    if !name.chars().all(|c| c.is_alphabetic()) {
+        return Err(ApiError::NotFound("Recipe not found"));
+    }
 
     let mut path = Path::new(THUMBS_PATH).join(name);
     path.add_extension("png");
