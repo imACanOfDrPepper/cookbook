@@ -22,7 +22,6 @@ fetch(`/api/get-recipe?name=${params.name}`)
         thumbnail.src = `/api/get-thumb?name=${params.name}`;
 
         thumbnail.onerror = () => {
-            console.log(thumbnail.src);
             thumbnail.src = "assets/placeholder.png"
         }
 
