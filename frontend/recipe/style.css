@@ -1,0 +1,43 @@
+#recipe-container {
+    list-style-position: inside;
+    text-align: center;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.list-container {
+    text-align: left;
+    border-radius: 10px;
+    background: #dddddd;
+    padding: 20px;
+    width: auto;
+}
+
+#ingredients, #steps {
+    padding: 0;
+}
+
+img {
+    height: 300px;
+    width: auto;
+    border-radius: 10px;
+}
+
+#back-to-menu {
+    color: black;
+    text-decoration: none;
+    transition: 0.25s;
+}
+
+#back-to-menu:hover {
+    scale: 1.1;
+}
+
+#back-to-menu::before {
+    content: "<";
+    padding: 0 5px 0 0;
+}

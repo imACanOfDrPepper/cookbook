@@ -1,6 +1,6 @@
 mod types;
 
-use crate::{types::{ApiError, Recipe}};
+use crate::types::{ApiError, Recipe};
 
 use axum::{
     Router,
@@ -42,13 +42,8 @@ async fn get_recipe(Query(params): Query<HashMap<String, String>>) -> Result<Res
     let json = fs::read_to_string(path)
         .await
         .map_err(|_| ApiError::NotFound("Recipe not found"))?;
-    
-    Ok((
-        StatusCode::OK,
-        [("Content-Type", "application/json")],
-        json,
-    )
-        .into_response())
+
+    Ok((StatusCode::OK, [("Content-Type", "application/json")], json).into_response())
 }
 
 async fn get_thumb(Query(params): Query<HashMap<String, String>>) -> Result<Response, ApiError> {
@@ -62,20 +57,15 @@ async fn get_thumb(Query(params): Query<HashMap<String, String>>) -> Result<Resp
     let image = fs::read(path)
         .await
         .map_err(|_| ApiError::NotFound("Thumbnail not found"))?;
-    
-    Ok((
-        StatusCode::OK,
-        [("Content-Type", "image/png")],
-        image,
-    )
-        .into_response())
+
+    Ok((StatusCode::OK, [("Content-Type", "image/png")], image).into_response())
 }
 
 async fn get_all_recipes() -> Result<Response, ApiError> {
     let mut entries = read_dir(RECIPES_PATH)
         .await
         .map_err(|_| ApiError::Internal)?;
-    
+
     let mut recipes = Vec::new();
 
     while let Ok(Some(entry)) = entries.next_entry().await {
@@ -91,22 +81,22 @@ async fn get_all_recipes() -> Result<Response, ApiError> {
             .to_string_lossy()
             .into_owned();
 
-        let json_str = fs::read_to_string(path).await.map_err(|_| ApiError::Internal)?;
+        let json_str = fs::read_to_string(path)
+            .await
+            .map_err(|_| ApiError::Internal)?;
         let json_value: Value = serde_json::from_str(&json_str).map_err(|_| ApiError::Internal)?;
 
-        let name = json_value.get("name")
+        let name = json_value
+            .get("name")
             .and_then(|v| v.as_str())
             .ok_or(ApiError::Internal)?
             .to_string();
 
-        let recipe = Recipe {
-            id: id,
-            name: name,
-        };
+        let recipe = Recipe { id: id, name: name };
 
         recipes.push(recipe);
     }
-    
+
     let recipes_json = serde_json::to_string(&recipes).map_err(|_| ApiError::Internal)?;
 
     Ok((

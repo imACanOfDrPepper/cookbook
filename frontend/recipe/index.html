@@ -4,20 +4,27 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>CookBook</title>
+        <link rel="stylesheet" href="style.css">
     </head>
 
     <body>
-        <a href="/" id="backToMenu">Back to Menu</a>
+        <div id="recipe-container">
+            <a href="/" id="back-to-menu">Back to Menu</a>
 
-        <div id="recipe">
-            <h1 id="title"></h1>
-            <img id="thumbnail"></img>
+            <div id="recipe">
+                <h1 id="title"></h1>
+                <img id="thumbnail"></img>
 
-            <h2>Ingredients:</h2>
-            <ul id="ingredients"></ul>
+                <h2>Ingredients:</h2>
+                <div class="list-container">
+                    <ul id="ingredients"></ul>
+                </div>
 
-            <h2>Steps:</h2>
-            <ol id="steps"></ol>
+                <h2>Steps:</h2>
+                <div class="list-container">
+                    <ol id="steps"></ol>
+                </div>
+            </div>
         </div>
 
         <script src="script.js"></script>

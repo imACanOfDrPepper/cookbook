@@ -30,6 +30,7 @@
 }
 
 .recipe-card:hover {
+    transition: 0.1s;
     transform: translateY(3px);
     background: #b2b2b2
 }

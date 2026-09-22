@@ -9,10 +9,12 @@ fetch(`/api/get-recipe?name=${params.name}`)
         } else {
             document.getElementById("recipe").remove();
 
+            const recipeContainer = document.getElementById("recipe-container");
+
             const failMessage = document.createElement("h1");
             failMessage.textContent = "Failed to read JSON file.";
 
-            document.body.appendChild(failMessage);
+            recipeContainer.appendChild(failMessage);
         }
     })
     .then(data => {
